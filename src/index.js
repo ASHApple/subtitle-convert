@@ -14,7 +14,7 @@ if (!process.browser) {
   Iconv = require('iconv').Iconv; // eslint-disable-line
   path = require('path'); // eslint-disable-line global-require
   fs = require('fs'); // eslint-disable-line global-require
-  DetectEncoding = require('detect-character-encoding'); // eslint-disable-line global-require
+  DetectEncoding = require('charset-detector'); // eslint-disable-line global-require
 }
 
 class SubtitleConverter {
@@ -28,7 +28,7 @@ class SubtitleConverter {
     try {
       if (!process.browser) {
         const raw = fs.readFileSync(filename);
-        const autoencode = DetectEncoding(raw);
+        const autoencode = DetectEncoding(raw)[0].charsetName;
         let enc = null;
         if (arguments.length <= 2) {
           enc = autoencode.encoding;
@@ -36,7 +36,7 @@ class SubtitleConverter {
           console.log(`[Warning] Expected encoding : ${autoencode.encoding} / Input : ${encode}`);
         }
         if (!enc) {
-          enc = encode;
+          enc = autoencode;
         }
         const iconv = new Iconv(enc, targetencode);
         const convraw = iconv.convert(raw);
